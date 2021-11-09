@@ -8,7 +8,7 @@ namespace SharpEngine
     class Program
     {
         static void Main(string[] args) {
-            
+            // initialize and configure
             var window = Window();
             CreatShaderProgram();
             LoadTriangleIntoBuffer();
@@ -17,6 +17,8 @@ namespace SharpEngine
             // engine rendering loop
             while (!Glfw.WindowShouldClose(window)) {
                 Glfw.PollEvents(); // react to window changes (position etc.)
+                glClearColor(0, 0, 0, 1);
+                glClear(GL_COLOR_BUFFER_BIT);
                 glDrawArrays(GL_TRIANGLES, 0, 3);
                 glFlush();
             }
@@ -25,9 +27,11 @@ namespace SharpEngine
         private static unsafe void LoadTriangleIntoBuffer()
         {
             float[] vertices = new float[]
-            {
+            {    // vertex 1 
                 -.5f, -.5f, 0f,
+                //vertex 2
                 .5f, -.5f, 0f,
+                //vertex 3
                 0f, .5f, 0f
             };
 
