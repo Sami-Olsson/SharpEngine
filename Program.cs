@@ -21,7 +21,7 @@ namespace SharpEngine
                 glClear(GL_COLOR_BUFFER_BIT);
                 glDrawArrays(GL_TRIANGLES, 0, 3);
                 
-                glFlush();
+                Glfw.SwapBuffers(window);
             }
         }
 
@@ -83,7 +83,7 @@ namespace SharpEngine
             Glfw.WindowHint(Hint.Decorated, true);
             Glfw.WindowHint(Hint.OpenglProfile, Profile.Core);
             Glfw.WindowHint(Hint.OpenglForwardCompatible, Constants.True);
-            Glfw.WindowHint(Hint.Doublebuffer, Constants.False);
+            Glfw.WindowHint(Hint.Doublebuffer, Constants.True);
 
             // create and launch a window
             var window = Glfw.CreateWindow(1024, 768, "SharpEngine", Monitor.None, GLFW.Window.None);
