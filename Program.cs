@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GLFW;
 
 namespace SharpEngine
 {
@@ -20,8 +21,8 @@ namespace SharpEngine
                     new Vertex(new Vector(.1f, 0f), Color.Green),
                     new Vertex(new Vector(0f, .133f), Color.Blue)
                 }, material);
-                triangle.Rotate(GetRandomFloat(random));
-                triangle.Move(new Vector(GetRandomFloat(random, -1, 1), GetRandomFloat(random, -1, 1)));
+                triangle.Transform.Rotate(GetRandomFloat(random));
+                triangle.Transform.Move(new Vector(GetRandomFloat(random, -1, 1), GetRandomFloat(random, -1, 1)));
                 scene.Add(triangle);
             }
         }
@@ -29,32 +30,47 @@ namespace SharpEngine
         static void Main(string[] args) {
             
             var window = new Window();
-            var material = new Material("shaders/position-color.vert", "shaders/vertex-color.frag");
+            var material = new Material("shaders/world-position-color.vert", "shaders/vertex-color.frag");
             var scene = new Scene();
             window.Load(scene);
 
-            FillSceneWithTriangles(scene, material);
+            //FillSceneWithTriangles(scene, material);
+            var newTriangle = new Triangle(new Vertex[] {
+                new Vertex(new Vector(-.1f, 0f), Color.Red),
+                new Vertex(new Vector(.1f, 0f), Color.Green),
+                new Vertex(new Vector(0f, .133f), Color.Blue)
+            }, material);
+            scene.Add(newTriangle);
             
             // engine rendering loop
-            var direction = new Vector(0.0003f, 0.0003f);
-            var multiplier = 0.999f;
-            var rotation = 0.0005f;
-            while (window.IsOpen()) {
+            var direction = new Vector(0.01f, 0.01f);
+            var multiplier = 0.95f;
+            var rotation = 0.05f;
+            const int fixedStepNumberPerSecond = 30;
+            const double fixedStepDuration = 1.0 / fixedStepNumberPerSecond;
+            double previousFixedStep = 0.0;
+            
+            
+            while (window.IsOpen())
+            {
 
                 // Update Triangles
                 for (var i = 0; i < scene.triangles.Count; i++) {
-                    var triangle = scene.triangles[i];
+                    var triangle = scene.triangles[i]; 
+                    
+                    if (Glfw.Time > previousFixedStep + fixedStepDuration)
+                        previousFixedStep = Glfw.Time;
                 
                     // 2. Keep track of the Scale, so we can reverse it
-                    if (triangle.CurrentScale <= 0.5f) {
-                        multiplier = 1.001f;
+                    if (triangle.Transform.CurrentScale.GetMagnitude() <= 0.5f) {
+                        multiplier = 1.05f;
                     }
-                    if (triangle.CurrentScale >= 1f) {
-                        multiplier = 0.999f;
+                    if (triangle.Transform.CurrentScale.GetMagnitude() >= 2f) {
+                        multiplier = 0.95f;
                     }
                     
-                    triangle.Scale(multiplier);
-                    triangle.Rotate(rotation);
+                    triangle.Transform.Scale(multiplier);
+                    triangle.Transform.Rotate(rotation);
                 
                     // 4. Check the X-Bounds of the Screen
                     if (triangle.GetMaxBounds().x >= 1 && direction.x > 0 || triangle.GetMinBounds().x <= -1 && direction.x < 0) {
@@ -67,7 +83,7 @@ namespace SharpEngine
                     }
                     
                     
-                    triangle.Move(direction);
+                    triangle.Transform.Move(direction);
                 }
                 
                 window.Render();
